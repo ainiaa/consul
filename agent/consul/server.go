@@ -221,12 +221,12 @@ type endpoints struct {
 }
 
 func NewServer(config *Config) (*Server, error) {
-	return NewServerLogger(config, nil)
+	return NewServerLogger(config, nil, new(token.Store))
 }
 
 // NewServer is used to construct a new Consul server from the
 // configuration, potentially returning an error
-func NewServerLogger(config *Config, logger *log.Logger) (*Server, error) {
+func NewServerLogger(config *Config, logger *log.Logger, tokens *token.Store) (*Server, error) {
 	// Check the protocol version.
 	if err := config.CheckProtocolVersion(); err != nil {
 		return nil, err
@@ -291,7 +291,7 @@ func NewServerLogger(config *Config, logger *log.Logger) (*Server, error) {
 		autopilotRemoveDeadCh: make(chan struct{}),
 		autopilotShutdownCh:   make(chan struct{}),
 		config:                config,
-		tokens:                config.Tokens,
+		tokens:                tokens,
 		connPool:              connPool,
 		eventChLAN:            make(chan serf.Event, 256),
 		eventChWAN:            make(chan serf.Event, 256),
